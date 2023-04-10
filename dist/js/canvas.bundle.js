@@ -138,12 +138,13 @@ var Particle = /*#__PURE__*/function () {
     this.x = x;
     this.y = y;
     this.velocity = {
-      x: Math.random() - 0.5,
-      y: Math.random() - 0.5
+      x: (Math.random() - 0.5) * 2,
+      y: (Math.random() - 0.5) * 2
     };
     this.radius = radius;
     this.color = color;
     this.mass = 1;
+    this.opacity = 0;
   }
 
   _createClass(Particle, [{
@@ -151,6 +152,11 @@ var Particle = /*#__PURE__*/function () {
     value: function draw() {
       c.beginPath();
       c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+      c.save();
+      c.globalAlpha = this.opacity;
+      c.fillStyle = this.color;
+      c.fill();
+      c.restore();
       c.strokeStyle = this.color;
       c.stroke();
       c.closePath();
@@ -190,6 +196,14 @@ var Particle = /*#__PURE__*/function () {
 
       if (this.y - this.radius <= 0 || this.y + this.radius >= innerHeight) {
         this.velocity.y = -this.velocity.y;
+      } // Mouse collision detection
+
+
+      if (Object(_utils__WEBPACK_IMPORTED_MODULE_0__["distance"])(mouse.x, mouse.y, this.x, this.y) < 120 && this.opacity < 0.2) {
+        this.opacity += 0.02;
+      } else if (this.opacity > 0) {
+        this.opacity -= 0.02;
+        this.opacity = Math.max(0, this.opacity);
       }
 
       this.x += this.velocity.x;
@@ -206,11 +220,11 @@ var particles;
 function init() {
   particles = [];
 
-  for (var i = 0; i < 4; i++) {
-    var radius = 80;
+  for (var i = 0; i < 100; i++) {
+    var radius = 15;
     var x = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["randomIntFromRange"])(radius, canvas.width - radius);
     var y = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["randomIntFromRange"])(radius, canvas.height - radius);
-    var color = 'blue';
+    var color = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["randomColor"])(colors);
 
     if (i !== 0) {
       for (var j = 0; j < particles.length; j++) {
